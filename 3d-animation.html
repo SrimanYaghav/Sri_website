@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="./assets/icon.png" />
+    <title>Sriman Yaghav - 3D & Animation</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="media.css" />
+    <link rel="stylesheet" href="creative.css" />
+    <script type="module" src="https://unpkg.com/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
+  </head>
+  <body>
+    <canvas id="bg-canvas"></canvas>
+
+    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
+      <span class="icon-sun">☀️</span>
+      <span class="icon-moon">🌙</span>
+    </button>
+
+    <nav id="desktop-nav">
+      <div class="logo">Sriman Yaghav</div>
+      <div>
+        <ul class="nav-links">
+          <li><a href="#about">About</a></li>
+          <li><a href="#photoshop">Photoshop</a></li>
+          <li><a href="#blender">3D Models</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+    </nav>
+    <nav id="hamburger-nav">
+      <div class="logo">Sriman Yaghav</div>
+      <div class="hamburger-menu">
+        <div class="hamburger-icon" onclick="toggleMenu()">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <div class="menu-links">
+          <li><a href="#about" onclick="toggleMenu()">About</a></li>
+          <li><a href="#photoshop" onclick="toggleMenu()">Photoshop</a></li>
+          <li><a href="#blender" onclick="toggleMenu()">3D Models</a></li>
+          <li><a href="#contact" onclick="toggleMenu()">Contact</a></li>
+        </div>
+      </div>
+    </nav>
+
+    <section id="profile">
+      <div class="section__pic-container">
+        <img src="./assets/pro.png" alt="profile picture" />
+      </div>
+      <div class="section__text">
+        <p class="section__text__p1">Hello, I'm</p>
+        <h1 class="title">Sriman Yaghav</h1>
+        <p class="section__text__p2">3D Artist &amp; Animator</p>
+        <div class="btn-container">
+          <button
+            class="btn btn-color-2"
+            onclick="location.href='https://drive.google.com/drive/folders/1TX82VG4Vl8ACjqkIS6Vfxdhg-nsUllua?usp=sharing'"
+          >
+            Download Resume
+          </button>
+          <button class="btn btn-color-1" onclick="location.href='#contact'">
+            Contact Info
+          </button>
+        </div>
+        <div id="socials-container">
+          <img
+            src="./assets/linkedin.png"
+            alt="My LinkedIn profile"
+            class="icon"
+            onclick="location.href='https://linkedin.com/in/SrimanYaghav'"
+          />
+          <img
+            src="./assets/github.png"
+            alt="My Github profile"
+            class="icon"
+            onclick="location.href='https://github.com/SrimanYaghav'"
+          />
+        </div>
+      </div>
+    </section>
+
+    <section id="about">
+      <p class="section__text__p1">Get To Know More</p>
+      <h1 class="title">About Me</h1>
+      <div class="section-container">
+        <div class="section__pic-container">
+          <img src="./assets/icon.png" alt="Profile picture" class="about-pic" />
+        </div>
+        <div class="about-details-container">
+          <div class="about-containers">
+            <div class="details-container reveal">
+              <img src="./assets/education.png" alt="Education icon" class="icon" />
+              <h3>Education</h3>
+              <p>
+                B.E. Computer Science Engineering 2022 - 2025 <br />
+                Electrical And Electronics Engineering (Polytechnic)
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <img
+        src="./assets/arrow.png"
+        alt="Arrow icon"
+        class="icon arrow"
+        onclick="location.href='#photoshop'"
+      />
+    </section>
+
+    <section id="photoshop">
+      <p class="section__text__p1">Browse My Recent</p>
+      <h1 class="title">Photoshop Work</h1>
+
+      <div class="gallery-container limited-grid" id="photoshop-grid">
+        <div class="gallery-item grid-item">
+          <img src="./assets/photoshop/work1.jpg" alt="Photoshop artwork 1" />
+          <button
+            class="zoom-btn"
+            data-type="image"
+            data-src="./assets/photoshop/work1.jpg"
+            data-alt="Photoshop artwork 1"
+            aria-label="View full size"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="10" cy="10" r="6"></circle>
+              <line x1="20" y1="20" x2="14.65" y2="14.65"></line>
+              <line x1="10" y1="7" x2="10" y2="13"></line>
+              <line x1="7" y1="10" x2="13" y2="10"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="gallery-item grid-item">
+          <img src="./assets/photoshop/work2.png" alt="Photoshop artwork 2" />
+          <button
+            class="zoom-btn"
+            data-type="image"
+            data-src="./assets/photoshop/work2.jpg"
+            data-alt="Photoshop artwork 2"
+            aria-label="View full size"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="10" cy="10" r="6"></circle>
+              <line x1="20" y1="20" x2="14.65" y2="14.65"></line>
+              <line x1="10" y1="7" x2="10" y2="13"></line>
+              <line x1="7" y1="10" x2="13" y2="10"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="gallery-item grid-item">
+          <img src="./assets/photoshop/work3.png" alt="Photoshop artwork 3" />
+          <button
+            class="zoom-btn"
+            data-type="image"
+            data-src="./assets/photoshop/work3.jpg"
+            data-alt="Photoshop artwork 3"
+            aria-label="View full size"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="10" cy="10" r="6"></circle>
+              <line x1="20" y1="20" x2="14.65" y2="14.65"></line>
+              <line x1="10" y1="7" x2="10" y2="13"></line>
+              <line x1="7" y1="10" x2="13" y2="10"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="gallery-item grid-item">
+          <img src="./assets/photoshop/work4.png" alt="Photoshop artwork 4" />
+          <button
+            class="zoom-btn"
+            data-type="image"
+            data-src="./assets/photoshop/work4.jpg"
+            data-alt="Photoshop artwork 4"
+            aria-label="View full size"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="10" cy="10" r="6"></circle>
+              <line x1="20" y1="20" x2="14.65" y2="14.65"></line>
+              <line x1="10" y1="7" x2="10" y2="13"></line>
+              <line x1="7" y1="10" x2="13" y2="10"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="gallery-item grid-item">
+          <img src="./assets/photoshop/work5.jpg" alt="Photoshop artwork 5" />
+          <button
+            class="zoom-btn"
+            data-type="image"
+            data-src="./assets/photoshop/work5.jpg"
+            data-alt="Photoshop artwork 5"
+            aria-label="View full size"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="10" cy="10" r="6"></circle>
+              <line x1="20" y1="20" x2="14.65" y2="14.65"></line>
+              <line x1="10" y1="7" x2="10" y2="13"></line>
+              <line x1="7" y1="10" x2="13" y2="10"></line>
+            </svg>
+          </button>
+        </div>
+        
+        <!--
+          Add more artwork by copying a .gallery-item.grid-item block above
+          (update the image src and the button's data-src/data-alt to match).
+          Once there are 5+ items, the 5th fades out and "Show all" appears
+          automatically — no extra setup needed.
+        -->
+      </div>
+      <div class="show-all-wrap">
+        <button class="show-all-btn" data-target="photoshop-grid">Show all</button>
+      </div>
+
+      <!-- <p class="placeholder-note">
+        Replace the images in <code>assets/photoshop/</code> with your own artwork
+        (keep the same filenames, or update the <code>src</code>/<code>data-src</code>
+        paths above).
+      </p> -->
+      <img
+        src="./assets/arrow.png"
+        alt="Arrow icon"
+        class="icon arrow"
+        onclick="location.href='#blender'"
+      />
+    </section>
+
+    <section id="blender">
+      <p class="section__text__p1">Explore My</p>
+      <h1 class="title">3D Models</h1>
+
+      <div class="model-grid limited-grid" id="blender-grid">
+        <div class="model-item grid-item">
+          <model-viewer
+            src="./assets/models/model1.glb"
+            alt="3D model 1"
+            camera-controls
+            auto-rotate
+            shadow-intensity="1"
+          ></model-viewer>
+          <h3>Model One</h3>
+          <button
+            class="zoom-btn"
+            data-type="model"
+            data-src="./assets/models/model1.glb"
+            data-alt="3D model 1"
+            aria-label="View full screen"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="10" cy="10" r="6"></circle>
+              <line x1="20" y1="20" x2="14.65" y2="14.65"></line>
+              <line x1="10" y1="7" x2="10" y2="13"></line>
+              <line x1="7" y1="10" x2="13" y2="10"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="model-item grid-item">
+          <model-viewer
+            src="./assets/models/model2.glb"
+            alt="3D model 2"
+            camera-controls
+            auto-rotate
+            shadow-intensity="1"
+          ></model-viewer>
+          <h3>Model Two</h3>
+          <button
+            class="zoom-btn"
+            data-type="model"
+            data-src="./assets/models/model2.glb"
+            data-alt="3D model 2"
+            aria-label="View full screen"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="10" cy="10" r="6"></circle>
+              <line x1="20" y1="20" x2="14.65" y2="14.65"></line>
+              <line x1="10" y1="7" x2="10" y2="13"></line>
+              <line x1="7" y1="10" x2="13" y2="10"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="model-item grid-item">
+          <model-viewer
+            src="./assets/models/model3.glb"
+            alt="3D model 3"
+            camera-controls
+            auto-rotate
+            shadow-intensity="1"
+          ></model-viewer>
+          <h3>Model Three</h3>
+          <button
+            class="zoom-btn"
+            data-type="model"
+            data-src="./assets/models/model2.glb"
+            data-alt="3D model 3"
+            aria-label="View full screen"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="10" cy="10" r="6"></circle>
+              <line x1="20" y1="20" x2="14.65" y2="14.65"></line>
+              <line x1="10" y1="7" x2="10" y2="13"></line>
+              <line x1="7" y1="10" x2="13" y2="10"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="model-item grid-item">
+          <model-viewer
+            src="./assets/models/model4.glb"
+            alt="3D model 4"
+            camera-controls
+            auto-rotate
+            shadow-intensity="1"
+          ></model-viewer>
+          <h3>Model Four</h3>
+          <button
+            class="zoom-btn"
+            data-type="model"
+            data-src="./assets/models/model4.glb"
+            data-alt="3D model 4"
+            aria-label="View full screen"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="10" cy="10" r="6"></circle>
+              <line x1="20" y1="20" x2="14.65" y2="14.65"></line>
+              <line x1="10" y1="7" x2="10" y2="13"></line>
+              <line x1="7" y1="10" x2="13" y2="10"></line>
+            </svg>
+          </button>
+        </div>
+        
+        <!--
+          Add more models the same way (copy a .model-item.grid-item block,
+          update src + data-src/data-alt). At 5+ models the same
+          fade + "Show all" behavior kicks in automatically.
+        -->
+      </div>
+      <div class="show-all-wrap">
+        <button class="show-all-btn" data-target="blender-grid">Show all</button>
+      </div>
+
+      <!-- <p class="placeholder-note">
+        Export your Blender models as <code>.glb</code> and place them in
+        <code>assets/models/</code> (drag to orbit, scroll/pinch to zoom, or tap the
+        zoom icon for a full-screen view).
+      </p> -->
+      <img
+        src="./assets/arrow.png"
+        alt="Arrow icon"
+        class="icon arrow"
+        onclick="location.href='#contact'"
+      />
+    </section>
+
+    <section id="contact">
+      <p class="section__text__p1">Get in Touch</p>
+      <h1 class="title">Contact Me</h1>
+      <div class="contact-info-upper-container">
+        <div class="contact-info-container">
+          <img
+            src="./assets/email.png"
+            alt="Email icon"
+            class="icon contact-icon email-icon"
+          />
+          <p><a href="mailto:srimanyaghav1454@gmail.com">srimanyaghav1454@gmail.com</a></p>
+        </div>
+        <div class="contact-info-container">
+          <img src="./assets/linkedin.png" alt="LinkedIn icon" class="icon contact-icon" />
+          <p><a href="https://www.linkedin.com/in/SrimanYaghav">LinkedIn</a></p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <nav>
+        <div class="nav-links-container">
+          <ul class="nav-links">
+            <li><a href="#about">About</a></li>
+            <li><a href="#photoshop">Photoshop</a></li>
+            <li><a href="#blender">3D Models</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div>
+      </nav>
+      <p>Copyright &#169; 2023 Sriman Yaghav Portfolio. All Rights Reserved.</p>
+    </footer>
+
+    <div id="lightbox" class="lightbox">
+      <button class="lightbox-close" aria-label="Close">&times;</button>
+      <div class="lightbox-content"></div>
+    </div>
+
+    <script src="background.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

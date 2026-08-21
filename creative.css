@@ -1,0 +1,300 @@
+/* ============================================
+   SHARED GRID ITEM WRAPPER (zoom button host)
+   ============================================ */
+
+.grid-item {
+  position: relative;
+}
+
+.zoom-btn {
+  position: absolute;
+  bottom: 0.7rem;
+  right: 0.7rem;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  border: none;
+  background: var(--overlay);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 200ms ease, transform 200ms ease, background 300ms ease;
+  z-index: 5;
+}
+
+.grid-item:hover .zoom-btn,
+.grid-item:focus-within .zoom-btn {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.zoom-btn:hover {
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.zoom-btn svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+/* touch devices: always show zoom button, no hover state */
+@media (hover: none) {
+  .zoom-btn {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ============================================
+   PHOTOSHOP GALLERY
+   ============================================ */
+
+#photoshop {
+  min-height: fit-content;
+}
+
+.gallery-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.gallery-item {
+  width: 300px;
+  height: 300px;
+  border-radius: 2rem;
+  overflow: hidden;
+  border: var(--border) 0.1rem solid;
+  background: var(--bg-soft);
+  transition: transform 300ms ease, box-shadow 300ms ease;
+}
+
+.gallery-item:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow);
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 400ms ease;
+}
+
+.gallery-item:hover img {
+  transform: scale(1.06);
+}
+
+/* ============================================
+   BLENDER MODEL VIEWER
+   ============================================ */
+
+#blender {
+  min-height: fit-content;
+}
+
+.model-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.model-item {
+  width: 300px;
+  height: 300px;
+  max-width: 100%;
+  text-align: center;
+  border-radius: 2rem;
+  overflow: hidden;
+  border: var(--border) 0.1rem solid;
+  background: var(--bg-soft);
+  transition: transform 300ms ease, box-shadow 300ms ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.model-item:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow);
+}
+
+.model-item model-viewer {
+  flex: 1;
+  width: 100%;
+  --poster-color: transparent;
+}
+
+.model-item h3 {
+  padding: 0.6rem 0;
+  font-size: 1rem;
+  background: var(--card-bg);
+}
+
+/* ============================================
+   LIMITED GRID — show 4 full, 5th half-cut, rest hidden
+   ============================================ */
+
+.limited-grid {
+  position: relative;
+}
+
+.limited-grid:not(.expanded) .grid-item:nth-child(n + 4) {
+  display: none;
+}
+
+.limited-grid:not(.expanded) .grid-item:nth-child(5) {
+  position: relative;
+  max-height: 150px;
+}
+
+.limited-grid:not(.expanded) .grid-item:nth-child(5) img,
+.limited-grid:not(.expanded) .grid-item:nth-child(5) model-viewer {
+  filter: brightness(0.9);
+}
+
+.limited-grid:not(.expanded) .grid-item:nth-child(5)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 0%, var(--overlay) 92%);
+  pointer-events: none;
+}
+
+.show-all-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.show-all-btn {
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.75rem 2rem;
+  border-radius: 2rem;
+  border: var(--border-strong) 0.1rem solid;
+  background: var(--card-bg);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 300ms ease;
+}
+
+.show-all-btn:hover {
+  background: var(--accent);
+  color: var(--accent-contrast);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+/* hide the show-all control entirely when there aren't enough items to need it */
+.limited-grid[data-count="0"] ~ .show-all-wrap,
+.limited-grid[data-count="1"] ~ .show-all-wrap,
+.limited-grid[data-count="2"] ~ .show-all-wrap {
+  display: none;
+}
+
+/* ============================================
+   LIGHTBOX
+   ============================================ */
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.85);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 300ms ease;
+  padding: 3rem 1.5rem;
+}
+
+.lightbox.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.lightbox-content {
+  max-width: 90vw;
+  max-height: 85vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: scale(0.92);
+  transition: transform 300ms ease;
+}
+
+.lightbox.open .lightbox-content {
+  transform: scale(1);
+}
+
+.lightbox-content img {
+  max-width: 90vw;
+  max-height: 85vh;
+  border-radius: 1rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  object-fit: contain;
+}
+
+.lightbox-content model-viewer {
+  width: 80vw;
+  height: 80vh;
+  max-width: 900px;
+  border-radius: 1rem;
+  background: var(--bg-soft);
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 250ms ease;
+}
+
+.lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
+}
+
+/* ============================================
+   PLACEHOLDER NOTE
+   ============================================ */
+
+.placeholder-note {
+  text-align: center;
+  font-size: 0.85rem;
+  margin-top: 1.5rem;
+  color: var(--text-muted);
+}
+
+.placeholder-note code {
+  background: var(--bg-soft);
+  padding: 0.1rem 0.4rem;
+  border-radius: 0.3rem;
+  border: var(--border) 0.05rem solid;
+}

@@ -100,4 +100,20 @@
   .text-container {
     text-align: justify;
   }
+  .theme-toggle {
+    top: 1rem;
+    right: 1rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1.1rem;
+  }
+  .gallery-item,
+  .model-item {
+    width: 100%;
+    max-width: 300px;
+  }
+  .lightbox-content model-viewer {
+    width: 90vw;
+    height: 60vh;
+  }
 }
