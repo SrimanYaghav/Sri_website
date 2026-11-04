@@ -1,253 +1,497 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/png" href="./assets/icon.png" />
-    <title>Sriman Yaghav - Software Developer</title>
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="media.css" />
-  </head>
-  <body>
-    <canvas id="bg-canvas"></canvas>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Sriman Yaghav Portfolio</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: the original single-page portfolio (profile, about, skills, projects, contact) with a drifting-dot canvas behind it, plus an HMI demo inside Projects. */
+:root{
+  --bg:#FFFFFF; --fg:#111111; --muted:#555555; --line:#A3A3A3; --card:#FAFAFA;
+  --btn:#111111; --btn-ink:#FFFFFF; --dot:#9A9A9A; --ok:#1E8E5A; --bad:#C0392B; --warn:#B7791F;
+  --panel:#0F1418; --panel-line:#2B3640; --panel-fg:#E3EAF0; --panel-mute:#8E9DAA;
+  --sans:'Poppins',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121212; --fg:#F1F1F1; --muted:#B0B0B0; --line:#555555; --card:#1B1B1B;
+    --btn:#F1F1F1; --btn-ink:#121212; --dot:#6E6E6E; --ok:#3FBF86; --bad:#F06A5A; --warn:#E3A93B;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121212; --fg:#F1F1F1; --muted:#B0B0B0; --line:#555555; --card:#1B1B1B;
+  --btn:#F1F1F1; --btn-ink:#121212; --dot:#6E6E6E; --ok:#3FBF86; --bad:#F06A5A; --warn:#E3A93B;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{
+  background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:16px;line-height:1.6;margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:0 0;
+}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--bg)}
+h1,h2,h3,p,ul{margin:0}
+ul{padding:0;list-style:none}
+a{color:inherit}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--fg);outline-offset:3px}
+#bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.layer{position:relative;z-index:1}
+.wrap{max-width:1100px;margin-inline:auto}
 
-    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
-      <span class="icon-sun">☀️</span>
-      <span class="icon-moon">🌙</span>
-    </button>
+/* nav */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg);border-bottom:1px solid var(--line);margin-inline:calc(-1 * max(16px,env(safe-area-inset-left,0px))) calc(-1 * max(16px,env(safe-area-inset-right,0px)));padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px))}
+.nav .wrap{display:flex;justify-content:space-between;align-items:center;min-height:64px;gap:12px}
+.logo{font-size:1.5rem;font-weight:600;text-decoration:none}
+.links{display:flex;gap:28px}
+.links a{text-decoration:none;color:var(--muted);padding:6px 0;border-bottom:2px solid transparent}
+.links a:hover{color:var(--fg);border-bottom-color:var(--line)}
+.burger{display:none;background:transparent;border:1px solid var(--line);border-radius:8px;width:44px;height:44px;cursor:pointer;color:var(--fg);padding:0;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+.burger span{display:block;width:22px;height:2px;background:var(--fg);transition:transform .2s,opacity .2s}
+.burger[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.burger[aria-expanded="true"] span:nth-child(2){opacity:0}
+.burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.drawer{display:none;flex-direction:column;border-top:1px solid var(--line);padding-block:8px}
+.drawer.open{display:flex}
+.drawer a{padding:12px 4px;text-decoration:none;border-bottom:1px solid var(--line)}
+.drawer a:last-child{border-bottom:0}
 
-    <nav id="desktop-nav">
-      <div class="logo">Sriman Yaghav</div>
+/* shared */
+.eyebrow{font-size:1.05rem;color:var(--muted);text-align:center}
+.title{font-size:clamp(2.2rem,6vw,3.2rem);font-weight:600;text-align:center;line-height:1.2}
+.btn{font:500 1rem var(--sans);padding:.9rem 1.8rem;border-radius:2rem;border:1.5px solid var(--btn);cursor:pointer;text-decoration:none;display:inline-block;text-align:center}
+.btn.solid{background:var(--btn);color:var(--btn-ink)}
+.btn.line{background:transparent;color:var(--fg)}
+.btn:hover{opacity:.8}
+.btn.sm{padding:.55rem 1.3rem;font-size:.9rem}
+.arrow{display:block;margin:34px auto 0;width:44px;height:44px;border-radius:50%;border:1.5px solid var(--line);text-align:center;line-height:40px;text-decoration:none;font-size:1.2rem;color:var(--muted)}
+.arrow:hover{border-color:var(--fg);color:var(--fg)}
+section.s{padding-block:76px 40px}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:2rem;padding:1.6rem 1.8rem;min-width:0}
+.card h2,.card h3{font-weight:600}
+
+/* profile */
+.profile{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:48px;align-items:center;min-height:calc(100vh - 140px);padding-block:48px}
+.pic{width:min(100%,380px);aspect-ratio:1/1;border-radius:50%;border:1.5px solid var(--line);margin-inline:auto;display:grid;place-items:center;background:var(--card);position:relative;overflow:hidden}
+.pic svg{width:100%;height:100%;display:block}
+.pic .dp{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+.p1{font-size:1.15rem;color:var(--muted);font-weight:500}
+.hero-name{font-size:clamp(2.6rem,7vw,4.2rem);font-weight:600;line-height:1.1;margin-block:4px 6px}
+.role{font-size:1.6rem;font-weight:600;color:var(--muted)}
+.btns{display:flex;gap:16px;flex-wrap:wrap;margin-top:28px}
+.social{display:flex;gap:12px;margin-top:26px;flex-wrap:wrap}
+.chipbtn{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--line);border-radius:2rem;padding:.4rem 1rem;text-decoration:none;font-size:.9rem;font-weight:500}
+.chipbtn:hover{border-color:var(--fg)}
+
+/* about */
+.about-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin-top:40px}
+.about-text{max-width:62ch;margin:26px auto 0;text-align:center;color:var(--muted)}
+.card h3{font-size:1.3rem;margin-bottom:8px}
+.card .meta{font-size:.9rem;color:var(--muted)}
+.card p+p{margin-top:10px}
+.stack li{padding:10px 0;border-top:1px solid var(--line)}
+.stack li:first-child{border-top:0;padding-top:0}
+.stack b{display:block;font-weight:600}
+.stack span{font-size:.9rem;color:var(--muted)}
+
+/* skills */
+.skills-card{margin-top:40px}
+.skills-card h2{font-size:1.6rem;text-align:center;margin-bottom:22px}
+.skill-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 28px}
+.skill-list li{display:flex;align-items:center;gap:12px;font-weight:500}
+.tick{flex:none;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--fg);position:relative}
+.tick::after{content:"";position:absolute;left:6px;top:3px;width:5px;height:10px;border:solid var(--fg);border-width:0 2px 2px 0;transform:rotate(45deg)}
+.skills-more{display:flex;gap:10px 30px;flex-wrap:wrap;justify-content:center;margin-top:22px;font-size:.92rem;color:var(--muted)}
+.skills-more b{color:var(--fg);font-weight:500}
+
+/* projects */
+.sub-title{font-size:1.5rem;font-weight:600;text-align:center;margin-top:56px}
+.sub-lead{text-align:center;color:var(--muted);margin-top:4px}
+.projects{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin-top:28px}
+.pc{display:flex;flex-direction:column;gap:14px;align-items:center;text-align:center;padding:1.4rem}
+.thumb{width:100%;aspect-ratio:16/10;border-radius:1.2rem;border:1.5px solid var(--line);background:var(--bg);display:grid;place-items:center;color:var(--fg);overflow:hidden}
+.thumb svg{width:56%;height:auto;max-height:78%}
+.pc h3{font-size:1.1rem;margin:0}
+.pc p{font-size:.88rem;color:var(--muted);margin:0}
+.pc .btns{margin-top:auto;justify-content:center}
+.pc .tagnote{font:500 .7rem var(--mono);letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);border-radius:2rem;padding:2px 10px;color:var(--muted)}
+
+/* hmi */
+.hmi{margin-top:36px;background:var(--panel);color:var(--panel-fg);border:1.5px solid var(--panel-line);border-radius:2rem;padding:20px;max-width:760px;margin-inline:auto}
+.hmi-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font:500 .72rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--panel-mute);margin-bottom:12px}
+.hmi-top b{color:#F2C230;font-weight:500}
+.kp{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.kp div{border:1px solid var(--panel-line);border-radius:12px;padding:8px 12px}
+.kp span{display:block;font:500 .64rem var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--panel-mute)}
+.kp b{font-size:1.5rem;font-weight:600;font-variant-numeric:tabular-nums}
+.spg{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.sp{position:relative;aspect-ratio:1/1;min-height:44px;border:1px solid var(--panel-line);border-radius:10px;background:#151C23;color:var(--panel-fg);font:500 .72rem var(--mono);cursor:pointer;padding:0;overflow:hidden}
+.sp i{position:absolute;left:0;right:0;bottom:0;background:var(--ok);opacity:.5;height:0;transition:height .9s linear}
+.sp b{position:absolute;top:4px;left:7px;font-weight:500;z-index:1}
+.sp.stop i{background:#6F7D89}
+.sp.brk{border-color:var(--bad)}
+.sp.brk i{background:var(--bad)}
+.sp.full{border-color:#F2C230}
+.sp.sel{outline:2px solid #fff;outline-offset:-2px}
+.hc{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.hc label{font:500 .68rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--panel-mute);display:flex;align-items:center;gap:6px}
+.hc input{width:3.4rem;background:#151C23;color:var(--panel-fg);border:1px solid var(--panel-line);border-radius:8px;padding:7px 6px;font:500 .9rem var(--mono)}
+.hc button{font:500 .76rem var(--mono);letter-spacing:.04em;text-transform:uppercase;background:transparent;color:var(--panel-fg);border:1px solid var(--panel-line);border-radius:2rem;padding:8px 14px;cursor:pointer;min-height:38px}
+.hc button:hover{border-color:#fff}
+.hc .go{color:var(--ok);border-color:var(--ok)}
+.hc .halt{color:var(--bad);border-color:var(--bad)}
+.hmi small{display:block;margin-top:12px;font:400 .68rem var(--mono);color:var(--panel-mute)}
+
+/* contact */
+.contact-row{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;margin-top:36px}
+.cc{display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center;min-width:min(100%,260px);flex:1 1 260px;max-width:340px}
+.cc .k{font:500 .7rem var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.cc .v{font-weight:500;overflow-wrap:anywhere;user-select:all}
+.cp{font:500 .78rem var(--sans);background:transparent;color:var(--fg);border:1.5px solid var(--line);border-radius:2rem;padding:.35rem 1rem;cursor:pointer}
+.cp:hover{border-color:var(--fg)}
+.hint{text-align:center;font-size:.85rem;color:var(--muted);min-height:1.4em;margin-top:12px}
+
+/* footer */
+footer{margin-top:60px;padding-block:28px calc(28px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);text-align:center;color:var(--muted);font-size:.9rem}
+footer ul{display:flex;gap:22px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
+footer a{text-decoration:none}
+
+/* theme */
+.theme{position:fixed;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:35;background:var(--btn);color:var(--btn-ink);border:0;border-radius:2rem;padding:.6rem 1.1rem;font:500 .85rem var(--sans);cursor:pointer;box-shadow:0 6px 18px -8px rgba(0,0,0,.5)}
+
+@media (max-width:900px){
+  .links{display:none}
+  .burger{display:flex}
+  .profile{grid-template-columns:minmax(0,1fr);text-align:center;min-height:0;gap:32px}
+  .pic{width:min(80%,320px)}
+  .btns,.social{justify-content:center}
+  .about-grid{grid-template-columns:minmax(0,1fr)}
+  .skill-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .projects{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:560px){
+  .skill-list,.projects{grid-template-columns:minmax(0,1fr)}
+  .spg{gap:6px}
+  section.s{padding-block:56px 24px}
+  .card{padding:1.3rem}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .sp i,.burger span{transition:none}
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg" aria-hidden="true"></canvas>
+
+<div class="layer">
+  <header class="nav">
+    <div class="wrap">
+      <div style="display:flex;justify-content:space-between;align-items:center;width:100%;min-height:64px;gap:12px">
+        <a class="logo" href="#profile">Sriman Yaghav</a>
+        <nav class="links" aria-label="Sections">
+          <a href="#about">About</a>
+          <a href="#skills">Skills</a>
+          <a href="#projects">Projects</a>
+          <a href="#contact">Contact</a>
+        </nav>
+        <button class="burger" id="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="drawer"><span></span><span></span><span></span></button>
+      </div>
+      <nav class="drawer" id="drawer" aria-label="Sections, mobile">
+        <a href="#about">About</a>
+        <a href="#skills">Skills</a>
+        <a href="#projects">Projects</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section id="profile" class="profile" aria-label="Introduction">
+      <div class="pic"><img id="dp" class="dp" src="./assets/pro.png" alt="Sriman Yaghav" onerror="this.remove()">
+        <svg viewBox="0 0 200 200" aria-hidden="true">
+          <circle cx="100" cy="100" r="99" fill="none"/>
+          <circle cx="100" cy="78" r="30" fill="none" stroke="currentColor" stroke-width="3" style="color:var(--fg)"/>
+          <path d="M40 168c6-34 30-50 60-50s54 16 60 50" fill="none" stroke="currentColor" stroke-width="3" style="color:var(--fg)"/>
+        </svg>
+      </div>
       <div>
-        <ul class="nav-links">
-          <li><a href="#about">About</a></li>
-          <li><a href="#skills">Skills</a></li>
-          <li><a href="#projects">Projects</a></li>
-          <li><a href="#contact">Contact</a></li>
-        </ul>
-      </div>
-    </nav>
-    <nav id="hamburger-nav">
-      <div class="logo">Sriman Yaghav</div>
-      <div class="hamburger-menu">
-        <div class="hamburger-icon" onclick="toggleMenu()">
-          <span></span>
-          <span></span>
-          <span></span>
+        <p class="p1">Hello, I'm</p>
+        <h1 class="hero-name">Sriman Yaghav C</h1>
+        <p class="role">Full Stack Developer</p>
+        <div class="btns">
+          <a class="btn line" href="https://drive.google.com/drive/folders/1eS9JdyXGawzX-7BADVuDaWBoRQ8b0V7b?usp=drive_link" target="_blank" rel="noopener">Download Resume</a>
+          <a class="btn solid" href="#contact">Contact Info</a>
         </div>
-        <div class="menu-links">
-          <li><a href="#about" onclick="toggleMenu()">About</a></li>
-          <li><a href="#skills" onclick="toggleMenu()">Skills</a></li>
-          <li><a href="#projects" onclick="toggleMenu()">Projects</a></li>
-          <li><a href="#contact" onclick="toggleMenu()">Contact</a></li>
-        </div>
-      </div>
-    </nav>
-    <section id="profile">
-      <div class="section__pic-container">
-        <img src="./assets/pro.png" alt="profile picture" />
-      </div>
-      <div class="section__text">
-        <p class="section__text__p1">Hello, I'm</p>
-        <h1 class="title">Sriman Yaghav</h1>
-        <p class="section__text__p2">Developer</p>
-        <div class="btn-container">
-          <button
-            class="btn btn-color-2"
-            onclick="location.href='https://drive.google.com/drive/folders/1eS9JdyXGawzX-7BADVuDaWBoRQ8b0V7b?usp=drive_link'"
-            
-          >
-            Download Resume
-          </button>
-          <button class="btn btn-color-1" onclick="location.href='#contact'">
-            Contact Info
-          </button>
-        </div>
-        <div id="socials-container">
-          <img
-            src="./assets/linkedin.png"
-            alt="My LinkedIn profile"
-            class="icon"
-            onclick="location.href='https://linkedin.com/in/SrimanYaghav'"
-          />
-          <img
-            src="./assets/github.png"
-            alt="My Github profile"
-            class="icon"
-            onclick="location.href='https://github.com/SrimanYaghav'"
-          />
+        <div class="social">
+          <a class="chipbtn" href="https://www.linkedin.com/in/SrimanYaghav" target="_blank" rel="noopener">LinkedIn</a>
+          <a class="chipbtn" href="https://github.com/SrimanYaghav" target="_blank" rel="noopener">GitHub</a>
         </div>
       </div>
     </section>
-    <section id="about">
-      <p class="section__text__p1">Get To Know More</p>
-      <h1 class="title">About Me</h1>
-      <div class="section-container">
-        <div class="section__pic-container">
-          <img
-            src="./assets/icon.png"
-            alt="Profile picture"
-            class="about-pic"
-          />
-        </div>
-        <div class="about-details-container">
-          <div class="about-containers">
-            <div class="details-container reveal">
-              <img
-                src="./assets/education.png"
-                alt="Education icon"
-                class="icon"
-              />
-              <h3>Education</h3>
-              <p>B.E. Computer Science Engineering 2022 - 2025 <br />Electrical And Electronics Engineering (Polytechnic)</p>
-            </div>
-          </div>
-          <div class="text-container">
-            <p></p>
-          </div>
-        </div>
-      </div>
-      <img
-        src="./assets/arrow.png"
-        alt="Arrow icon"
-        class="icon arrow"
-        onclick="location.href='#skills'"
-      />
-    </section>
-    <section id="skills">
-      <p class="section__text__p1">Explore My</p>
-      <h1 class="title">Fresher</h1>
-      <div class="experience-details-container">
-        <div class="about-containers">
-          <div class="details-container reveal">
-            <h2 class="experience-sub-title">Technical Skills</h2>
-            <div class="article-container">
-              <article>
-                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
-                <div><h3>HTML/CSS</h3><p></p></div>
-              </article>
-              <article>
-                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
-                <div><h3>C/C++</h3><p></p></div>
-              </article>
-              <article>
-                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
-                <div><h3>JAVA</h3><p></p></div>
-              </article>
-              <article>
-                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
-                <div><h3>Git & Github</h3><p></p></div>
-              </article>
-              <article>
-                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
-                <div><h3>Python</h3><p></p></div>
-              </article>
-              <article>
-                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
-                <div><h3>Auto CAD</h3><p></p></div>
-              </article>
-              <article>
-                <img src="./assets/checkmark.png" alt="Experience icon" class="icon" />
-                <div><h3>PC Build</h3><p></p></div>
-              </article>
-            </div>
-          </div>
-        </div>
-      </div>
-      <img
-        src="./assets/arrow.png"
-        alt="Arrow icon"
-        class="icon arrow"
-        onclick="location.href='#projects'"
-      />
-    </section>
-    <section id="projects">
-      <p class="section__text__p1">Browse My Recent</p>
-      <h1 class="title">Projects</h1>
-      <div class="experience-details-container">
-        <div class="about-containers">
-          <div class="details-container color-container reveal">
-            <div class="article-container">
-              <img src="./assets/tic.png" alt="Project 1" class="project-img" />
-            </div>
-            <h2 class="experience-sub-title project-title">Project One - Tic Tac Toe</h2>
-            <div class="btn-container">
-              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/SrimanYaghav/Tic_Tac_Toe.git'">Github</button>
-            </div>
-          </div>
-          <div class="details-container color-container reveal">
-            <div class="article-container">
-              <img src="./assets/snake.png" alt="Project 2" class="project-img" />
-            </div>
-            <h2 class="experience-sub-title project-title">Project Two - Snake Game</h2>
-            <div class="btn-container">
-              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/SrimanYaghav/Snake_Game.git'">Github</button>
-            </div>
-          </div>
-          <div class="details-container color-container reveal">
-            <div class="article-container">
-              <img src="./assets/wea.png" alt="Project 3" class="project-img" />
-            </div>
-            <h2 class="experience-sub-title project-title">Project Three - Weather Forecast</h2>
-            <div class="btn-container">
-              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Github</button>
-            </div>
-          </div>
-          <div class="details-container color-container reveal">
-            <div class="article-container">
-              <img src="./assets/tts.png" alt="Project 4" class="project-img" />
-            </div>
-            <h2 class="experience-sub-title project-title">Project Four - Text-To-Speech</h2>
-            <div class="btn-container">
-              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/'">Github</button>
-            </div>
-          </div>
-          <div class="details-container color-container reveal">
-            <div class="article-container">
-              <img src="./assets/solar.png" alt="Project 5" class="project-img" />
-            </div>
-            <h2 class="experience-sub-title project-title">Project Five - Solar Sea-Based IOT Remote Monitor</h2>
-            <div class="btn-container">
-              <button class="btn btn-color-2 project-btn" onclick="location.href='https://github.com/SrimanYaghav/Solar-Power-Sea-Based-Remote-Monitoring-Using-IOT.git'">Github</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <img
-        src="./assets/arrow.png"
-        alt="Arrow icon"
-        class="icon arrow"
-        onclick="location.href='#contact'"
-      />
-    </section>
-    <section id="contact">
-      <p class="section__text__p1">Get in Touch</p>
-      <h1 class="title">Contact Me</h1>
-      <div class="contact-info-upper-container">
-        <div class="contact-info-container">
-          <img src="./assets/email.png" alt="Email icon" class="icon contact-icon email-icon" />
-          <p><a href="mailto:srimanyaghav1454@gmail.com">srimanyaghav1454@gmail.com</a></p>
-        </div>
-        <div class="contact-info-container">
-          <img src="./assets/linkedin.png" alt="LinkedIn icon" class="icon contact-icon" />
-          <p><a href="https://www.linkedin.com/in/SrimanYaghav">LinkedIn</a></p>
-        </div>
-      </div>
-    </section>
-    <footer>
-      <nav>
-        <div class="nav-links-container">
-          <ul class="nav-links">
-            <li><a href="#about">About</a></li>
-            <li><a href="#skills">Skills</a></li>
-            <li><a href="#projects">Projects</a></li>
-            <li><a href="#contact">Contact</a></li>
+
+    <section id="about" class="s" aria-labelledby="about-h">
+      <p class="eyebrow">Get To Know More</p>
+      <h2 class="title" id="about-h">About Me</h2>
+      <p class="about-text">Full Stack Developer with 1.6+ years of experience building monitoring and control software with React front ends and Python backends. Quick learner, eager to contribute to product and full-stack teams.</p>
+      <div class="about-grid">
+        <div class="card">
+          <h3>Experience</h3>
+          <ul class="stack">
+            <li><b>Software Developer</b><span>Reshmi Industries · 1.6 years</span></li>
+            <li><b>Intern, Web Development (Front-End)</b><span>BlazingCoders · 1 month</span></li>
           </ul>
         </div>
-      </nav>
-      <p>Copyright &#169; 2023 Sriman Yaghav Portfolio. All Rights Reserved.</p>
-    </footer>
-    <script src="background.js"></script>
-    <script src="script.js"></script>
-  </body>
+        <div class="card">
+          <h3>Education</h3>
+          <ul class="stack">
+            <li><b>B.E. Computer Science Engineering</b><span>Anna University Regional Campus, Coimbatore · 2022 to 2025 · 7.8 CGPA</span></li>
+            <li><b>Electrical and Electronic Engineering</b><span>Government Polytechnic College, Coimbatore · 2019 to 2022 · 90%</span></li>
+          </ul>
+        </div>
+      </div>
+      <a class="arrow" href="#skills" aria-label="Go to skills">↓</a>
+    </section>
+
+    <section id="skills" class="s" aria-labelledby="skills-h">
+      <p class="eyebrow">Explore My</p>
+      <h2 class="title" id="skills-h">Skills</h2>
+      <div class="card skills-card">
+        <h2>Technical Skills</h2>
+        <ul class="skill-list">
+          <li><i class="tick"></i>HTML / CSS</li>
+          <li><i class="tick"></i>JavaScript</li>
+          <li><i class="tick"></i>React.js</li>
+          <li><i class="tick"></i>Python</li>
+          <li><i class="tick"></i>Flask &amp; SQLite</li>
+          <li><i class="tick"></i>C / C++</li>
+          <li><i class="tick"></i>Java</li>
+          <li><i class="tick"></i>Git &amp; GitHub</li>
+          <li><i class="tick"></i>Linux</li>
+          <li><i class="tick"></i>Auto CAD</li>
+          <li><i class="tick"></i>PC Build</li>
+          <li><i class="tick"></i>Networking</li>
+        </ul>
+        <div class="skills-more">
+          <span><b>Certifications:</b> C/C++, Java, Network Essentials, MS Office</span>
+          <span><b>Languages:</b> Tamil, English</span>
+          <span><b>Hobbies:</b> Trekking, cooking, video games</span>
+        </div>
+      </div>
+      <a class="arrow" href="#projects" aria-label="Go to projects">↓</a>
+    </section>
+
+    <section id="projects" class="s" aria-labelledby="projects-h">
+      <p class="eyebrow">Browse My Recent</p>
+      <h2 class="title" id="projects-h">Projects</h2>
+
+      <div class="projects">
+        <div class="card pc">
+          <div class="thumb"><svg viewBox="0 0 120 80" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="104" height="64" rx="8"/><path d="M20 56l16-18 14 10 18-24 14 14 18-12"/><circle cx="32" cy="22" r="3" fill="currentColor"/></svg></div>
+          <h3>Touchscreen HMI</h3>
+          <p>A machine monitoring and control touchscreen with live dashboards, alarms and reports.</p>
+          <span class="tagnote">Company project</span>
+          <!-- <div class="btns"><a class="btn solid sm" href="#hmi-demo">Try the demo</a></div> -->
+        </div>
+        <div class="card pc">
+          <div class="thumb"><svg viewBox="0 0 120 80" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="18" y="10" width="84" height="46" rx="12"/><path d="M42 56l-6 14 18-14"/><circle cx="46" cy="33" r="4" fill="currentColor"/><circle cx="74" cy="33" r="4" fill="currentColor"/></svg></div>
+          <h3>Interactive Chatbot</h3>
+          <p>Two AI APIs and a Blender 3D character that reacts with expressions and animations.</p>
+         <span class="tagnote">Own project</span>
+        </div>
+        <div class="card pc">
+          <div class="thumb"><svg viewBox="0 0 120 80" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 14h12l8 36h48l8-26H30"/><circle cx="40" cy="62" r="5"/><circle cx="76" cy="62" r="5"/></svg></div>
+          <h3>ElectroGame</h3>
+          <p>Front end for an e-commerce site selling gaming products and electronics.</p>
+          <span class="tagnote">Intern Project</span>
+        </div>
+        <div class="card pc">
+          <div class="thumb"><svg viewBox="0 0 120 80" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 28l40-18 40 18-40 18z"/><path d="M20 28v28l40 18 40-18V28M60 46v28"/></svg></div>
+          <h3>Stock Maintenance System</h3>
+          <p>NetBeans app with an XAMPP backend for inventory, customers and logins.</p>
+          <span class="tagnote"> Own Project</span>
+        </div>
+      </div>
+      <h3 class="sub-title">Earlier projects</h3>
+      <p class="sub-lead">Fun Project</p>
+      <div class="projects">
+        <div class="card pc">
+          <div class="thumb"><svg viewBox="0 0 120 80" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" aria-hidden="true"><path d="M46 8v64M74 8v64M20 30h80M20 52h80"/></svg></div>
+          <h3>Tic Tac Toe</h3>
+          <div class="btns"><a class="btn solid sm" href="https://github.com/SrimanYaghav/Tic_Tac_Toe.git" target="_blank" rel="noopener">GitHub</a></div>
+        </div>
+        <div class="card pc">
+          <div class="thumb"><svg viewBox="0 0 120 80" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 64h36V40h30V16h22"/><circle cx="106" cy="16" r="4" fill="currentColor"/></svg></div>
+          <h3>Snake Game</h3>
+          <div class="btns"><a class="btn solid sm" href="https://github.com/SrimanYaghav/Snake_Game.git" target="_blank" rel="noopener">GitHub</a></div>
+        </div>
+        <div class="card pc">
+          <div class="thumb"><svg viewBox="0 0 120 80" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" aria-hidden="true"><circle cx="44" cy="32" r="12"/><path d="M44 10v6M22 32h6M28 16l4 4M60 16l-4 4M38 66h44a12 12 0 0 0 0-24 16 16 0 0 0-30 4 10 10 0 0 0-14 20z"/></svg></div>
+          <h3>Weather Forecast</h3>
+          <div class="btns"><a class="btn solid sm" href="https://github.com/SrimanYaghav" target="_blank" rel="noopener">GitHub</a></div>
+        </div>
+        <div class="card pc">
+          <div class="thumb"><svg viewBox="0 0 120 80" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" aria-hidden="true"><path d="M18 40v0M30 28v24M42 16v48M54 26v28M66 33v14M78 20v40M90 30v20M102 38v4"/></svg></div>
+          <h3>Text-To-Speech</h3>
+          <div class="btns"><a class="btn solid sm" href="https://github.com/SrimanYaghav" target="_blank" rel="noopener">GitHub</a></div>
+        </div>
+        <div class="card pc" style="grid-column:1/-1">
+          <div class="thumb" style="max-width:360px;margin-inline:auto"><svg viewBox="0 0 120 80" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" aria-hidden="true"><circle cx="60" cy="22" r="10"/><path d="M60 4v4M36 22h4M80 22h4M8 56c10-8 18-8 28 0s18 8 28 0 18-8 28 0 12 6 20 0M8 70c10-8 18-8 28 0s18 8 28 0 18-8 28 0 12 6 20 0"/></svg></div>
+          <h3>Solar Sea-Based IoT Remote Monitor</h3>
+          <p>IoT-based remote monitoring system.</p>
+          <div class="btns"><a class="btn solid sm" href="https://github.com/SrimanYaghav/Solar-Power-Sea-Based-Remote-Monitoring-Using-IOT.git" target="_blank" rel="noopener">GitHub</a></div>
+        </div>
+      </div>
+      <a class="arrow" href="#contact" aria-label="Go to contact">↓</a>
+    </section>
+
+    <section id="contact" class="s" aria-labelledby="contact-h">
+      <p class="eyebrow">Get in Touch</p>
+      <h2 class="title" id="contact-h">Contact Me</h2>
+      <div class="contact-row">
+        <div class="card cc">
+          <span class="k">Email</span>
+          <span class="v" id="cMail">srimanyaghav1454@gmail.com</span>
+          <button class="cp" type="button" data-copy="cMail">Copy</button>
+        </div>
+        <div class="card cc">
+          <span class="k">Phone</span>
+          <span class="v" id="cTel">+91 6382236609</span>
+          <button class="cp" type="button" data-copy="cTel">Copy</button>
+        </div>
+        <div class="card cc">
+          <span class="k">LinkedIn</span>
+          <span class="v"><a href="https://www.linkedin.com/in/SrimanYaghav" target="_blank" rel="noopener">SrimanYaghav</a></span>
+          <a class="cp" href="https://www.linkedin.com/in/SrimanYaghav" target="_blank" rel="noopener" style="text-decoration:none">Open</a>
+        </div>
+      </div>
+      <div class="hint" id="hint" role="status"></div>
+    </section>
+  </main>
+
+  <footer>
+    <ul>
+      <li><a href="#about">About</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <p>Copyright © 2026 Sriman Yaghav Portfolio. All Rights Reserved.</p>
+  </footer>
+</div>
+
+<button class="theme" id="theme" type="button" aria-label="Switch between light and dark theme">Dark mode</button>
+
+<script>
+(function(){
+  var root=document.documentElement;
+  var dp=document.getElementById('dp');if(dp&&dp.complete&&dp.naturalWidth===0)dp.remove();
+
+  /* theme */
+  var tb=document.getElementById('theme');
+  function eff(){var t=root.getAttribute('data-theme');return t||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');}
+  function lab(){tb.textContent=eff()==='dark'?'Light mode':'Dark mode';}
+  try{var s=localStorage.getItem('sy-classic-theme');if(s==='dark'||s==='light')root.setAttribute('data-theme',s);}catch(e){}
+  lab();
+  tb.addEventListener('click',function(){
+    var n=eff()==='dark'?'light':'dark';root.setAttribute('data-theme',n);
+    try{localStorage.setItem('sy-classic-theme',n);}catch(e){}
+    lab();dotColor();
+  });
+
+  /* menu */
+  var bg=document.getElementById('burger'),dr=document.getElementById('drawer');
+  function setMenu(o){dr.classList.toggle('open',o);bg.setAttribute('aria-expanded',o);bg.setAttribute('aria-label',o?'Close menu':'Open menu');}
+  bg.addEventListener('click',function(){setMenu(!dr.classList.contains('open'));});
+  dr.addEventListener('click',function(e){if(e.target.tagName==='A')setMenu(false);});
+
+  /* background dots */
+  var cv=document.getElementById('bg'),cx=cv.getContext('2d'),dots=[],col='#999',W=0,H=0;
+  var still=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function dotColor(){col=getComputedStyle(root).getPropertyValue('--dot').trim()||'#999';}
+  function size(){
+    var r=window.devicePixelRatio||1;W=window.innerWidth;H=window.innerHeight;
+    cv.width=W*r;cv.height=H*r;cx.setTransform(r,0,0,r,0,0);
+    var n=Math.round(Math.min(70,W*H/22000));dots=[];
+    for(var i=0;i<n;i++)dots.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25});
+  }
+  function frame(){
+    cx.clearRect(0,0,W,H);cx.fillStyle=col;cx.strokeStyle=col;
+    for(var i=0;i<dots.length;i++){
+      var d=dots[i];
+      if(!still){d.x+=d.vx;d.y+=d.vy;if(d.x<0||d.x>W)d.vx*=-1;if(d.y<0||d.y>H)d.vy*=-1;}
+      cx.globalAlpha=.55;cx.beginPath();cx.arc(d.x,d.y,1.8,0,6.283);cx.fill();
+      for(var j=i+1;j<dots.length;j++){
+        var e=dots[j],dx=d.x-e.x,dy=d.y-e.y,q=dx*dx+dy*dy;
+        if(q<16000){cx.globalAlpha=.18*(1-q/16000);cx.beginPath();cx.moveTo(d.x,d.y);cx.lineTo(e.x,e.y);cx.stroke();}
+      }
+    }
+    if(!still)requestAnimationFrame(frame);
+  }
+  dotColor();size();frame();
+  window.addEventListener('resize',function(){size();if(still)frame();});
+  try{window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){dotColor();if(still)frame();});}catch(e){}
+
+  /* HMI demo */
+  var N=12,u=[],doffs=0,t0=Date.now();
+  var grid=document.getElementById('hGrid'),cells=[],fr=document.getElementById('hFrom'),to=document.getElementById('hTo');
+  function rnd(a,b){return a+Math.floor(Math.random()*(b-a+1));}
+  function pad(n){return n<10?'0'+n:''+n;}
+  function hms(ms){var q=Math.floor(ms/1000);return pad(Math.floor(q/3600))+':'+pad(Math.floor(q/60)%60)+':'+pad(q%60);}
+  function init(){u=[];doffs=0;t0=Date.now();for(var i=0;i<N;i++)u.push({s:i===5?'stop':'run',f:rnd(30,92)});}
+  function rng(){
+    var a=Math.max(1,Math.min(N,parseInt(fr.value,10)||1)),z=Math.max(1,Math.min(N,parseInt(to.value,10)||1));
+    return a<=z?[a-1,z-1]:[z-1,a-1];
+  }
+  for(var i=0;i<N;i++){
+    var b=document.createElement('button');b.type='button';b.className='sp';
+    b.innerHTML='<b>'+pad(i+1)+'</b><i></i>';
+    b.addEventListener('click',(function(n){return function(){fr.value=n+1;to.value=n+1;draw();};})(i));
+    grid.appendChild(b);cells.push(b);
+  }
+  var nm={run:'running',stop:'stopped',brk:'break'};
+  function draw(){
+    var r=rng(),run=0;
+    for(var i=0;i<N;i++){
+      var d=u[i],c=cells[i],full=d.f>=100&&d.s!=='brk';
+      if(d.s==='run')run++;
+      c.className='sp '+d.s+(full?' full':'')+(i>=r[0]&&i<=r[1]?' sel':'');
+      c.lastChild.style.height=d.f+'%';
+      c.setAttribute('aria-label','Unit '+(i+1)+', '+nm[d.s]+', '+d.f+' percent'+(full?', ready to doff':''));
+    }
+    document.getElementById('hRun').textContent=run;
+    document.getElementById('hDoff').textContent=doffs;
+    document.getElementById('hEff').textContent=Math.round(run/N*100)+'%';
+  }
+  function tick(){
+    for(var i=0;i<N;i++){var d=u[i];if(d.s==='run'){d.f=Math.min(100,d.f+rnd(3,7));if(Math.random()<0.012)d.s='brk';}}
+    document.getElementById('hClock').textContent=hms(Date.now()-t0);draw();
+  }
+  document.getElementById('hStart').addEventListener('click',function(){var r=rng();for(var i=r[0];i<=r[1];i++)u[i].s='run';draw();});
+  document.getElementById('hStop').addEventListener('click',function(){var r=rng();for(var i=r[0];i<=r[1];i++)u[i].s='stop';draw();});
+  document.getElementById('hDoffBtn').addEventListener('click',function(){var r=rng();for(var i=r[0];i<=r[1];i++){if(u[i].f>=100&&u[i].s!=='brk'){u[i].f=0;doffs++;}}draw();});
+  document.getElementById('hReset').addEventListener('click',function(){init();draw();});
+  fr.addEventListener('input',draw);to.addEventListener('input',draw);
+  init();draw();setInterval(tick,1100);
+
+  /* copy */
+  var hint=document.getElementById('hint');
+  document.querySelectorAll('button.cp').forEach(function(b){
+    b.addEventListener('click',function(){
+      var el=document.getElementById(b.dataset.copy),txt=el.textContent;
+      function sel(){var r=document.createRange();r.selectNodeContents(el);var g=window.getSelection();g.removeAllRanges();g.addRange(r);hint.textContent='Selected. Copy it with your keyboard.';}
+      try{navigator.clipboard.writeText(txt).then(function(){hint.textContent='Copied '+txt;},sel);}catch(e){sel();}
+    });
+  });
+})();
+</script>
+</body>
 </html>
