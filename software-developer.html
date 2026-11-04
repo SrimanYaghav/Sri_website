@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Sriman Yaghav Portfolio</title>
-<meta name="claude:viewport-fit-sides" content="cover">
+<title>Sriman Yaghav - Software Developer</title>
+<link rel="icon" type="image/png" href="./assets/icon.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -441,6 +441,7 @@ footer a{text-decoration:none}
   try{window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){dotColor();if(still)frame();});}catch(e){}
 
   /* HMI demo */
+  if(document.getElementById('hGrid')){
   var N=12,u=[],doffs=0,t0=Date.now();
   var grid=document.getElementById('hGrid'),cells=[],fr=document.getElementById('hFrom'),to=document.getElementById('hTo');
   function rnd(a,b){return a+Math.floor(Math.random()*(b-a+1));}
@@ -481,6 +482,8 @@ footer a{text-decoration:none}
   document.getElementById('hReset').addEventListener('click',function(){init();draw();});
   fr.addEventListener('input',draw);to.addEventListener('input',draw);
   init();draw();setInterval(tick,1100);
+
+  }
 
   /* copy */
   var hint=document.getElementById('hint');
